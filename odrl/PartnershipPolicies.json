@@ -40,6 +40,22 @@
                             }
                         ],
                         "consentingParty": "http://example.com/parcelSchedulingSystem/consentment"
+                    },
+                    {
+                        "action": [
+                            {
+                                "rdf:value": {
+                                    "@id": "execute"
+                                },
+                                "refinement": [
+                                    {
+                                        "leftOperand": "spatial",
+                                        "operator": "eq",
+                                        "rightOperand": "Germany"
+                                    }
+                                ]
+                            }
+                        ]
                     }
                 ]
             }

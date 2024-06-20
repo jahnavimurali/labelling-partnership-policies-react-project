@@ -109,26 +109,21 @@ const Manager = () => {
   const [error, setError] = useState(null);
   const [message, setMessage] = useState('');
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const localPoliciesData = await fetchAndParsePolicies('/odrl/LocalPolicies.json');
-        const partnershipPoliciesData = await fetchAndParsePolicies('/odrl/PartnershipPolicies.json');
-        // console.log("HELLO ", localPoliciesData)
-        // console.log("WORLD ", partnershipPoliciesData)
+  const fetchData = async () => {
+    try {
+      const localPoliciesData = await fetchAndParsePolicies('/odrl/LocalPolicies.json');
+      const partnershipPoliciesData = await fetchAndParsePolicies('/odrl/PartnershipPolicies.json');
+      console.log("HELLO ", localPoliciesData)
+      console.log("WORLD ", partnershipPoliciesData)
 
-        setLocalPolicies(localPoliciesData);
-        setPartnershipPolicies(partnershipPoliciesData);
-      } catch (error) {
-        setError(error.message);
-      }
-    };
+      setLocalPolicies(localPoliciesData);
+      setPartnershipPolicies(partnershipPoliciesData);
+    } catch (error) {
+      setError(error.message);
+    }
+  };
 
-    fetchData();
-  }, []);
-
-  useEffect(() => {
-    let conflict = [];
+  const compare = () => {
     for(let i=0;i<partnershipPolicies.length;i++) {
       let PP = partnershipPolicies[i]
       if (!PP.leftOperand === "dateTime") {
@@ -146,17 +141,25 @@ const Manager = () => {
           comparePolicies(LP, PP);
         });
       }
+
       else {
         for (let j = 0; j < localPolicies.length; j++) {
           if (localPolicies[j].leftOperand === "dateTime" && localPolicies[j + 1].leftOperand === "dateTime") {
             comparePairPolicies(localPolicies[j], localPolicies[j + 1], PP, partnershipPolicies[i + 1]);
             i++;
             break;
+          }
+          else{
+            comparePolicies(localPolicies[j], PP)
           } 
         }
       }
-    }}, [localPolicies, partnershipPolicies]);
-
+    }}
+  
+  const handleSubmit = async () =>{
+    await fetchData();
+    await compare();
+  }
 
   if (error) {
     return <div>Error: {error}</div>;
@@ -165,7 +168,7 @@ const Manager = () => {
   return (
     <div>
       <h2>Policy Comparison Results</h2>
-      <p>{message}</p>
+      <input type = 'submit' value = 'Submit' onClick={()=>handleSubmit()}/>
     </div>
   );
 };
