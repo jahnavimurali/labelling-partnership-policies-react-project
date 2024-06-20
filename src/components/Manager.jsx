@@ -58,34 +58,35 @@ const parsePolicies = (data) => {
   return policies;
 };
 
-const comparePairPolicies = (LP1, LP2, PP1, PP2)=>{
+const comparePairPolicies = async (LP1, LP2, PP1, PP2)=>{
   let conflict = '';
   try{
-    conflict = compareInterval(LP1, LP2, PP1, PP2)
+    conflict = await compareInterval(LP1, LP2, PP1, PP2)
     console.log(`Local Policy : ${LP1.toString()}`);
     console.log(LP2.toShortString())
     console.log(`Partnership Policy : ${PP1.toString()}`);
     console.log(PP2.toShortString())
     console.log(conflict);
+    return conflict;
   }catch (error) {
     console.error('Error comparing policies:', error);
   }
 }
 
 // Function to compare policies based on their type
-const comparePolicies = (LP, PP) => {
+const comparePolicies = async (LP, PP) => {
   let conflict = '';
 
   try {
     if ((PP.target==LP.target)&&(PP.leftOperand==LP.leftOperand)){
       if (PP.leftOperand === 'dateTime') {
-        conflict = compareDateTime(LP, PP);
+        conflict = await compareDateTime(LP, PP);
       } else if (PP.leftOperand === 'count') {
-        conflict = compareCount(LP, PP);
+        conflict = await compareCount(LP, PP);
       } else if (PP.leftOperand === 'spatial') {
-        conflict = compareSpatial(LP, PP);
+        conflict = await compareSpatial(LP, PP);
       } else if (PP.leftOperand === 'payAmount'){
-        conflict = comparePayAmount(LP, PP)
+        conflict = await comparePayAmount(LP, PP)
       }
       else {
         console.log(`Unsupported policy type: ${LP.leftOperand}`);
@@ -95,6 +96,7 @@ const comparePolicies = (LP, PP) => {
     console.log(`Local Policy : ${LP.toString()}`);
     console.log(`Partnership Policy : ${PP.toString()}`);
     console.log(conflict);
+    return conflict;
   } catch (error) {
     console.error('Error comparing policies:', error);
   }
@@ -105,12 +107,15 @@ const Manager = () => {
   const [localPolicies, setLocalPolicies] = useState([]);
   const [partnershipPolicies, setPartnershipPolicies] = useState([]);
   const [error, setError] = useState(null);
+  const [message, setMessage] = useState('');
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         const localPoliciesData = await fetchAndParsePolicies('/odrl/LocalPolicies.json');
         const partnershipPoliciesData = await fetchAndParsePolicies('/odrl/PartnershipPolicies.json');
+        // console.log("HELLO ", localPoliciesData)
+        // console.log("WORLD ", partnershipPoliciesData)
 
         setLocalPolicies(localPoliciesData);
         setPartnershipPolicies(partnershipPoliciesData);
@@ -123,6 +128,7 @@ const Manager = () => {
   }, []);
 
   useEffect(() => {
+    let conflict = [];
     for(let i=0;i<partnershipPolicies.length;i++) {
       let PP = partnershipPolicies[i]
       if (!PP.leftOperand === "dateTime") {
@@ -159,7 +165,7 @@ const Manager = () => {
   return (
     <div>
       <h2>Policy Comparison Results</h2>
-      <p>Open your browser console to see policy comparison results.</p>
+      <p>{message}</p>
     </div>
   );
 };

@@ -12,8 +12,8 @@ function App() {
   return (
     <>
       <div>
-      <h1>GeoNames API Data</h1>
-      <GeoNamesAPI searchQuery={searchQuery} username={username} />
+      {/* <h1>GeoNames API Data</h1> */}
+      {/* <GeoNamesAPI searchQuery={searchQuery} username={username} /> */}
       <Manager />
     </div>
     </>
