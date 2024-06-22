@@ -7,8 +7,8 @@ import Manager from './components/Manager'
 
 function App() {
   // sample input to test GeoNames API
-  const searchQuery = 'Tokyo';
-  const username = 'aathish2110240';
+  // const searchQuery = 'Tokyo';
+  // const username = 'aathish2110240';
   return (
     <>
       <div>
