@@ -392,8 +392,9 @@ export const compareInterval = (LP1, LP2, PP1, PP2) => {
 };
 
 
-export const compareSpatial = async (LP, PP) => {
+export const compareGeoDataSpatial = async (LP, PP) => {
     let label = "";
+
 
     try {
         const dataLP = await getGeodata(LP.rightOperand);
@@ -433,6 +434,47 @@ export const compareSpatial = async (LP, PP) => {
     return label;
 };
 
+export const compareSpatial = async(LP, PP) =>{
+    let label = ""
+
+    try {
+        const dataLP = await getWikiGeoData(LP.rightOperand);
+        const dataPP = await getWikiGeoData(PP.rightOperand);
+
+        const iscountryLP = dataLP.type == "country";
+        const iscountryPP = dataPP.type == "country";
+
+        if (LP.rightOperand == PP.rightOperand) {
+            label = "Neutral: Policies target the same region.";
+        } else if (iscountryLP && iscountryPP) {
+            label = "Cannot be labelled: Both policies target independent countries, making a direct comparison difficult.";
+        } else if (iscountryLP) {
+            if (dataPP.country === LP.rightOperand) {
+                label = "Opposing: Local policy targets the country, while the partnership policy targets a region within the same country.";
+            } else {
+                label = "Cannot be labelled: Local policy targets a country, but the partnership policy targets a different region.";
+            }
+        } else if (iscountryPP) {
+            if (dataLP.country === PP.rightOperand) {
+                label = "Supportive: Partnership policy targets the country, while the local policy targets a region within the same country.";
+            } else {
+                label = "Cannot be labelled: Partnership policy targets a country, but the local policy targets a different region.";
+            }
+        } else {
+            if (dataLP.name === dataPP.name) {
+                label = "Neutral: Both policies target the same region.";
+            } else {
+                label = "Cannot be labelled: Policies target different regions.";
+            }
+        }
+    } catch (error) {
+        console.error("Error fetching geodata:", error);
+        label = "Cannot be labelled: Unable to determine policy relationship due to data retrieval error.";
+    }
+
+    return label;
+}
+
 
 const getGeodata = async (searchQuery) => {
     const username = "aathish2110240";
@@ -452,6 +494,46 @@ const getGeodata = async (searchQuery) => {
     } catch (error) {
         console.error("Error fetching geodata:", error);
         throw error;
+    }
+}
+
+const getWikiGeoData = async (searchQuery) => {
+    const query = `
+    SELECT ?entity ?entityLabel ?instanceOf ?instanceOfLabel ?country ?countryLabel WHERE {
+      ?entity rdfs:label "${searchQuery}"@en.
+      ?entity wdt:P31 ?instanceOf.
+      OPTIONAL { ?entity wdt:P17 ?country. }
+      SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
+    }
+    `;
+
+    const url = new URL('https://query.wikidata.org/sparql');
+    url.searchParams.set('query', query);
+    url.searchParams.set('format', 'json');
+
+    try {
+        const response = await fetch(url);
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const data = await response.json();
+        const results = data.results.bindings;
+
+        if (results.length > 0) {
+            const result = results[0];
+            const locationInfo = {
+                name: result.entityLabel ? result.entityLabel.value : 'Unknown',
+                type: result.instanceOfLabel ? result.instanceOfLabel.value : 'Unknown',
+                country: result.countryLabel ? result.countryLabel.value : 'Unknown'
+            };
+            return locationInfo;
+        } else {
+            return { error: 'No results found' };
+        }
+    } catch (error) {
+        console.error(`Error fetching location info from Wikidata: ${error}`);
+        return { error: 'Failed to retrieve data' };
     }
 }
 
