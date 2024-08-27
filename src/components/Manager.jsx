@@ -78,6 +78,11 @@ const comparePolicies = async (LP, PP) => {
         return;
       }
     }
+    else {
+      console.log("Targets/Operators do not match.")
+      return
+    }
+    
     console.log(`Local Policy : ${LP.toString()}`);
     console.log(`Partnership Policy : ${PP.toString()}`);
     console.log(conflict);
