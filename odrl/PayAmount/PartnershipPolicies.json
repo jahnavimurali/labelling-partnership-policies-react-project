@@ -1,0 +1,34 @@
+[
+    {
+        "@context": "http://www.w3.org/ns/odrl.jsonld",
+        "uid": "http://example.com/policy:302",
+        "@type": "Agreement",
+        "permission": [
+            {
+                "target": "http://example.com/weDeliver/asset/parcelSchedulingSystem",
+                "assigner": "http://example.com/weDeliver",
+                "assignee": "http://example.com/weRetail/users/John",
+                "duty": [
+                    {
+                        "action": [
+                            {
+                                "rdf:value": {
+                                    "@id": "odrl:execute"
+                                },
+                                "refinement": [
+                                    {
+                                        "leftOperand": "payAmount",
+                                        "operator": "lteq",
+                                        "rightOperand": "1500",
+                                        "comment": "Partnership policy allows payment less than or equal to 1500."
+                                    }
+                                ]
+                            }
+                        ],
+                        "consentingParty": "http://example.com/parcelSchedulingSystem/consentment"
+                    }
+                ]
+            }
+        ]
+    }
+]
