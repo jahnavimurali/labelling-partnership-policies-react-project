@@ -45,8 +45,10 @@ const parsePolicies = (data) => {
 
 const comparePairPolicies = async (LP1, LP2, PP1, PP2) => {
   let conflict = '';
+  console.log("hi");
   try {
     conflict = await compareInterval(LP1, LP2, PP1, PP2);
+    
 
     // debug print statements
     // console.log(`Local Policy : ${LP1.toString()}`);
@@ -132,8 +134,10 @@ const App=()=>{
 
   const compare = async () => {
     let results = [];
+    console.log("BP -1");
   
     for (let i = 0; i < partnershipPolicies.length; i++) {
+      console.log("BP -2");
       let PP = partnershipPolicies[i];
   
       if (PP.leftOperand !== "dateTime") {
@@ -141,20 +145,25 @@ const App=()=>{
           const result = await comparePolicies(LP, PP);
           if (result != null) results.push(result);
         }
-      } else if (i === partnershipPolicies.length - 1) {
+      } 
+      else if (i === partnershipPolicies.length - 1) {
         for (let LP of localPolicies) {
+          console.log("BP -3");
           const result = await comparePolicies(LP, PP);
           if (result != null) results.push(result);
         }
-      } else if (partnershipPolicies[i + 1].leftOperand !== "dateTime") {
+      } 
+      else if (partnershipPolicies[i + 1].leftOperand !== "dateTime") {
         for (let LP of localPolicies) {
           const result = await comparePolicies(LP, PP);
           if (result != null) results.push(result);
         }
       } else {
+        console.log("BP - 4")
         for (let j = 0; j < localPolicies.length; j++) {
           if (localPolicies[j].leftOperand === "dateTime" && localPolicies[j + 1].leftOperand === "dateTime") {
             const result = await comparePairPolicies(localPolicies[j], localPolicies[j + 1], PP, partnershipPolicies[i + 1]);
+            
             if (result != null) results.push(result);
             i++;
             break;
@@ -198,14 +207,17 @@ const App=()=>{
                 <th>Local Policy</th>
                 <th>Partnership Policy</th>
                 <th>Relationship</th>
+                <th>Allen Relation</th>
               </tr>
             </thead>
             <tbody>
               {comparisonResults.map((result, index) => (
                 <tr key={index}>
+                  {/* <td>{JSON.stringify(result)}</td> */}
                   <td>{result.localPolicy}</td>
                   <td>{result.partnershipPolicy}</td>
-                  <td>{result.relationship}</td>
+                  {result.relationship.label ? <td>{result.relationship.label}</td> :<td>{result.relationship}</td>  }
+                  {result.relationship.allenRelation ? <td>{result.relationship.allenRelation}</td> : <td>Not Relevant</td>}
                 </tr>
               ))}
             </tbody>

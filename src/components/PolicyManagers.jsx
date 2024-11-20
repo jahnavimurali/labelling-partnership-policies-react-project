@@ -1,4 +1,46 @@
 // all required comparison functionalities
+
+export const getAllenRelation = (start1, end1, start2, end2) => {
+    // Convert dates to timestamps for easier comparison
+    const s1 = start1.getTime();
+    const e1 = end1.getTime();
+    const s2 = start2.getTime();
+    const e2 = end2.getTime();
+
+    // Implementation of all 13 Allen's relations
+    if (s1 === s2 && e1 === e2) {
+        return "EQUAL";
+    } else if (e1 < s2) {
+        return "BEFORE";
+    } else if (e1 === s2) {
+        return "MEETS";
+    } else if (s1 > s2 && e1 < e2) {
+        return "DURING";
+    } else if (s1 < s2 && e1 > e2) {
+        return "CONTAINS";
+    } else if (s1 === s2 && e1 < e2) {
+        return "STARTS";
+    } else if (s1 === s2 && e1 > e2) {
+        return "STARTED_BY";
+    } else if (s1 > s2 && e1 === e2) {
+        return "FINISHES";
+    } else if (s1 < s2 && e1 === e2) {
+        return "FINISHED_BY";
+    } else if (s1 < s2 && e1 < e2 && e1 > s2) {
+        return "OVERLAPS";
+    } else if (s1 > s2 && e1 > e2 && s1 < e2) {
+        return "OVERLAPPED_BY";
+    } else if (s2 < s1) {
+        return "AFTER";
+    } else if (s2 === e1) {
+        return "MET_BY";
+    }
+    return "UNKNOWN";
+};
+
+// Enhanced interval comparison incorporating Allen's relations
+
+
 export const compareCount = (LP, PP) => {
     let label = "";
     const pp = parseInt(PP.rightOperand);
@@ -356,40 +398,89 @@ export const compareDateTime = (LP, PP) => {
     return label;
 };
 
-  
 export const compareInterval = (LP1, LP2, PP1, PP2) => {
     let label = "";
-
+    
     const blp = new Date(LP1.rightOperand);
     const elp = new Date(LP2.rightOperand);
     const bpp = new Date(PP1.rightOperand);
     const epp = new Date(PP2.rightOperand);
 
-    const lp = { start: blp, end: elp };
-    const pp = { start: bpp, end: epp };
-
-    if (lp.start.getTime() === pp.start.getTime() && lp.end.getTime() === pp.end.getTime()) {
-        label = "Neutral: The intervals of both policies are identical.";
-    } else if (elp <= bpp || elp.getTime() === bpp.getTime() || epp <= blp || epp.getTime() === blp.getTime()) {
-        label = "Cannot be labelled: The intervals do not overlap.";
-    } else if (bpp <= blp && epp >= elp) {
-        label = "Supportive: The partnership policy covers the entire interval of the local policy.";
-    } else if (blp <= bpp && elp >= epp) {
-        label = "Opposing: The local policy covers the entire interval of the partnership policy.";
-    } else if (blp.getTime() === bpp.getTime() && elp < epp) {
-        label = "Supportive: Both policies start at the same time, but the partnership policy extends longer.";
-    } else if (blp.getTime() === bpp.getTime() && epp < elp) {
-        label = "Opposing: Both policies start at the same time, but the local policy extends longer.";
-    } else if (elp.getTime() === epp.getTime() && blp > bpp) {
-        label = "Supportive: Both policies end at the same time, but the partnership policy starts earlier.";
-    } else if (elp.getTime() === epp.getTime() && blp < bpp) {
-        label = "Opposing: Both policies end at the same time, but the local policy starts earlier.";
-    } else if ((blp < epp && elp > bpp) || (bpp < elp && epp > blp)) {
-        label = "Partially supportive/opposing: The intervals overlap but do not fully encompass each other.";
+    const allenRelation = getAllenRelation(blp, elp, bpp, epp);
+    
+    
+    // Map Allen's relations to policy comparison labels
+    switch (allenRelation) {
+        case "EQUAL":
+            label = "'EQUAL - Neutral: The intervals of both policies are identical.";
+            break;
+        case "DURING":
+            label = "'DURING' - Opposing: The local policy interval falls completely within the partnership policy interval.";
+            break;
+        case "CONTAINS":
+            label = "'CONTAINS' - Supportive: The partnership policy interval falls completely within the local policy interval.";
+            break;
+        case "STARTS":
+        case "STARTED_BY":
+            label = "'STARTS or STARTED BY' - Partially supportive/opposing: Policies start together but have different end points.";
+            break;
+        case "FINISHES":
+        case "FINISHED_BY":
+            label = "'FINISHES or  FINISHED BY' - Partially supportive/opposing: Policies end together but have different start points.";
+            break;
+        case "OVERLAPS":
+        case "OVERLAPPED_BY":
+            label = "OVERLAPS or OVERLAPPED_BY - Partially supportive/opposing: The intervals partially overlap.";
+            break;
+        case "BEFORE":
+        case "AFTER":
+        case "MEETS":
+        case "MET_BY":
+            label = "BEFORE AFTER MEETS OR MET BY - Cannot be labelled: The intervals do not overlap.";
+            break;
+        default:
+            label = "Cannot be labelled: Unable to determine temporal relationship.";
     }
+    console.log(label,allenRelation)
+    
+    return {
+        label: label,
+        allenRelation: allenRelation, // Including the specific Allen relation for more detailed analysis if needed
+    };
+}; 
+// export const compareInterval = (LP1, LP2, PP1, PP2) => {
+//     let label = "";
 
-    return label;
-};
+//     const blp = new Date(LP1.rightOperand);
+//     const elp = new Date(LP2.rightOperand);
+//     const bpp = new Date(PP1.rightOperand);
+//     const epp = new Date(PP2.rightOperand);
+
+//     const lp = { start: blp, end: elp };
+//     const pp = { start: bpp, end: epp };
+
+//     if (lp.start.getTime() === pp.start.getTime() && lp.end.getTime() === pp.end.getTime()) {
+//         label = "Neutral: The intervals of both policies are identical.";
+//     } else if (elp <= bpp || elp.getTime() === bpp.getTime() || epp <= blp || epp.getTime() === blp.getTime()) {
+//         label = "Cannot be labelled: The intervals do not overlap.";
+//     } else if (bpp <= blp && epp >= elp) {
+//         label = "Supportive: The partnership policy covers the entire interval of the local policy.";
+//     } else if (blp <= bpp && elp >= epp) {
+//         label = "Opposing: The local policy covers the entire interval of the partnership policy.";
+//     } else if (blp.getTime() === bpp.getTime() && elp < epp) {
+//         label = "Supportive: Both policies start at the same time, but the partnership policy extends longer.";
+//     } else if (blp.getTime() === bpp.getTime() && epp < elp) {
+//         label = "Opposing: Both policies start at the same time, but the local policy extends longer.";
+//     } else if (elp.getTime() === epp.getTime() && blp > bpp) {
+//         label = "Supportive: Both policies end at the same time, but the partnership policy starts earlier.";
+//     } else if (elp.getTime() === epp.getTime() && blp < bpp) {
+//         label = "Opposing: Both policies end at the same time, but the local policy starts earlier.";
+//     } else if ((blp < epp && elp > bpp) || (bpp < elp && epp > blp)) {
+//         label = "Partially supportive/opposing: The intervals overlap but do not fully encompass each other.";
+//     }
+
+//     return label;
+// };
 
 
 export const compareGeoDataSpatial = async (LP, PP) => {

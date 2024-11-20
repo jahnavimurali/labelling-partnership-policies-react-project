@@ -1,0 +1,67 @@
+[
+    {
+        "@context": "http://www.w3.org/ns/odrl.jsonld",
+        "uid": "http://example.com/policy:302",
+        "@type": "Agreement",
+        "permission": [
+            {
+                "target": "http://example.com/weDeliver/asset/parcelSchedulingSystem",
+                "assigner": "http://example.com/weDeliver",
+                "assignee": "http://example.com/weRetail/users/John",
+                "duty": [
+                    {
+                        "action": [
+                            {
+                                "rdf:value": {
+                                    "@id": "odrl:execute"
+                                },
+                                "refinement": [
+                                    {
+                                        "leftOperand": "dateTime",
+                                        "operator": "lt",
+                                        "rightOperand": "2024-09-01T10:00:00Z",
+                                        "comment": "Partnership policy ends before September 1, 2024."
+                                    }
+                                ]
+                            }
+                        ],
+                        "consentingParty": "http://example.com/parcelSchedulingSystem/consentment"
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        "@context": "http://www.w3.org/ns/odrl.jsonld",
+        "uid": "http://example.com/policy:302",
+        "@type": "Agreement",
+        "permission": [
+            {
+                "target": "http://example.com/weDeliver/asset/parcelSchedulingSystem",
+                "assigner": "http://example.com/weDeliver",
+                "assignee": "http://example.com/weRetail/users/John",
+                "duty": [
+                    {
+                        "action": [
+                            {
+                                "rdf:value": {
+                                    "@id": "odrl:execute"
+                                },
+                                "refinement": [
+                                    {
+                                        "leftOperand": "dateTime",
+                                        "operator": "lt",
+                                        "rightOperand": "2024-09-01T10:00:00Z",
+                                        "comment": "Partnership policy ends before September 1, 2024."
+                                    }
+                                ]
+                            }
+                        ],
+                        "consentingParty": "http://example.com/parcelSchedulingSystem/consentment"
+                    }
+                ]
+            }
+        ]
+    }
+    
+]
