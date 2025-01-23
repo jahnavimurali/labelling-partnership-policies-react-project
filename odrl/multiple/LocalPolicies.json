@@ -57,9 +57,9 @@
                                 "refinement": [
                                     {
                                         "leftOperand": "dateTime",
-                                        "operator": "gt",
-                                        "rightOperand": "2024-08-15T10:00:00Z",
-                                        "comment": "Local policy effective after August 15, 2024."
+                                        "operator": "lt",
+                                        "rightOperand": "2024-12-31T23:59:59Z",
+                                        "comment": "Local policy valid until December 31, 2024."
                                     }
                                 ]
                             }

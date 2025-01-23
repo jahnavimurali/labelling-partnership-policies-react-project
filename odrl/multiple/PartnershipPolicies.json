@@ -18,9 +18,9 @@
                                 "refinement": [
                                     {
                                         "leftOperand": "dateTime",
-                                        "operator": "lt",
-                                        "rightOperand": "2024-09-01T10:00:00Z",
-                                        "comment": "Partnership policy ends before September 1, 2024."
+                                        "operator": "gt",
+                                        "rightOperand": "2024-08-01T00:00:00Z",
+                                        "comment": "Partnership policy effective after August 1, 2024."
                                     }
                                 ]
                             }
